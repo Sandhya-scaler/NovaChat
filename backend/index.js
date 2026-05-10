@@ -22,14 +22,19 @@ const allowedOrigins = rawAllowedOrigins
       : `https://${origin}`
   );
 
+console.log("🌐 Allowed CORS origins:", allowedOrigins);
+
 app.use(
   cors({
     origin: (origin, callback) => {
+      // Allow requests with no origin (server-to-server, curl, health checks)
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, origin);
-      return callback(new Error("Not allowed by CORS"));
+      console.warn(`⛔ CORS blocked origin: ${origin}`);
+      return callback(null, false);
     },
-    methods: ["GET", "POST", "DELETE"],
+    methods: ["GET", "POST", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
